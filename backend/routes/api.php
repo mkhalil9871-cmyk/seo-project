@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProjectController;
 use App\Http\Controllers\Api\KeywordController;
 use App\Http\Controllers\Api\ContentPieceController;
+use App\Http\Controllers\Api\StrategyController;
 
 Route::middleware('throttle:6,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -33,5 +34,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/content', [ContentPieceController::class, 'index']);
         Route::post('/content', [ContentPieceController::class, 'generate']);
         Route::get('/content/{contentPiece}', [ContentPieceController::class, 'show']);
+
+        Route::get('/strategies', [StrategyController::class, 'index']);
+        Route::post('/strategies', [StrategyController::class, 'generate']);
+        Route::get('/strategies/{strategy}', [StrategyController::class, 'show']);
     });
 });
