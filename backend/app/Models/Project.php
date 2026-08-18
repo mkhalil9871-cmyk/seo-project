@@ -46,6 +46,11 @@ class Project extends Model
     { 
         return $this->hasMany(Audit::class); 
     } 
+
+    public function contentPieces(): HasMany
+{
+    return $this->hasMany(ContentPiece::class);
+}
  
     public function keywords(): HasMany 
     { 
