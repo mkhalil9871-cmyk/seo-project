@@ -11,13 +11,13 @@ Artisan::command('inspire', function () {
 // This single line is the entire "cron system" the crawler needs.
 // On shared hosting (cPanel etc.), the ONE cron entry to add is:
 //   * * * * * cd /path/to/backend && php artisan schedule:run >> /dev/null 2>&1
-// Laravel's scheduler dispatches this on that cadence — no separate cron line
-// for the crawler itself, and no queue worker/Supervisor/Redis needed.
 Schedule::command('crawler:process')
     ->everyMinute()
     ->withoutOverlapping(5)
     ->runInBackground();
-    
-    use App\Console\Commands\FetchSerpResults;
 
 Schedule::command('serp:fetch --batch=10')->everyMinute()->withoutOverlapping();
+
+Schedule::command('content:generate --batch=5')->everyMinute()->withoutOverlapping();
+
+Schedule::command('strategy:generate --batch=5')->everyMinute()->withoutOverlapping();

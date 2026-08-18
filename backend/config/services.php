@@ -28,18 +28,23 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'serp' => [
-    'provider' => env('SERP_PROVIDER', 'serper'),
-],
+            'serp' => [
+        'provider' => env('SERP_PROVIDER', 'serper'),
+    ],
 
-'serper' => [
-    'key' => env('SERPER_API_KEY'),
-],
+    'serper' => [
+        'key' => env('SERPER_API_KEY'),
+    ],
 
-'dataforseo' => [
-    'login' => env('DATAFORSEO_LOGIN'),
-    'password' => env('DATAFORSEO_PASSWORD'),
-],
+    'dataforseo' => [
+        'login' => env('DATAFORSEO_LOGIN'),
+        'password' => env('DATAFORSEO_PASSWORD'),
+    ],
+
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+        'model' => env('OPENAI_MODEL', 'gpt-4.1-mini'),
+    ],
 
     'slack' => [
         'notifications' => [
