@@ -17,3 +17,7 @@ Schedule::command('crawler:process')
     ->everyMinute()
     ->withoutOverlapping(5)
     ->runInBackground();
+    
+    use App\Console\Commands\FetchSerpResults;
+
+Schedule::command('serp:fetch --batch=10')->everyMinute()->withoutOverlapping();

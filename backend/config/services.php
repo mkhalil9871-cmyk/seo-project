@@ -28,6 +28,19 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'serp' => [
+    'provider' => env('SERP_PROVIDER', 'serper'),
+],
+
+'serper' => [
+    'key' => env('SERPER_API_KEY'),
+],
+
+'dataforseo' => [
+    'login' => env('DATAFORSEO_LOGIN'),
+    'password' => env('DATAFORSEO_PASSWORD'),
+],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
