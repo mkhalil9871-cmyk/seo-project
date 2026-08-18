@@ -20,6 +20,11 @@ class Keyword extends Model
         return $this->belongsTo(Project::class);
     }
 
+    public function rankTrackings()
+{
+    return $this->hasMany(RankTracking::class);
+}
+
     public function serpResults()
     {
         return $this->hasMany(SerpResult::class);
