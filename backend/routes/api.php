@@ -3,7 +3,8 @@
 use App\Http\Controllers\Api\AuditController;
 use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\ProjectController;
+use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\StrategyController;
 
 Route::middleware('throttle:6,1')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
@@ -21,4 +22,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/audits/{audit}/issues/summary', [AuditController::class, 'issuesSummary']);
     Route::get('/audits/{audit}/export.csv', [AuditController::class, 'exportCsv']);
     Route::get('/audits/{audit}/export-pages.csv', [AuditController::class, 'exportPagesCsv']);
+
+    Route::get('/projects/{project}/strategies', [StrategyController::class, 'index']);
+    Route::post('/projects/{project}/strategies', [StrategyController::class, 'generate']);
+    Route::get('/projects/{project}/strategies/{strategy}', [StrategyController::class, 'show']);
 });

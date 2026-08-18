@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
+use App\Console\Commands\GenerateStrategy;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -17,3 +18,7 @@ Schedule::command('crawler:process')
     ->everyMinute()
     ->withoutOverlapping(5)
     ->runInBackground();
+
+    Schedule::command('strategy:generate --batch=5')
+    ->everyMinute()
+    ->withoutOverlapping();

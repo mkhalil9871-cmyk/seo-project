@@ -47,6 +47,11 @@ class Project extends Model
         return $this->hasMany(Audit::class);
     }
 
+    public function strategies(): HasMany
+{
+    return $this->hasMany(Strategy::class);
+}
+
     public function latestAudit()
     {
         return $this->audits()->latest()->first();
