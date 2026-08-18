@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Schedule;
+use App\Console\Commands\GenerateContent;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -20,4 +21,10 @@ Schedule::command('crawler:process')
     
     use App\Console\Commands\FetchSerpResults;
 
-Schedule::command('serp:fetch --batch=10')->everyMinute()->withoutOverlapping();
+Schedule::command('serp:fetch --batch=10')
+->everyMinute()
+->withoutOverlapping();
+
+Schedule::command('content:generate --batch=5')
+->everyMinute()
+->withoutOverlapping();
