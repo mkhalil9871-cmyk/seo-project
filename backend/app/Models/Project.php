@@ -47,10 +47,20 @@ class Project extends Model
         return $this->hasMany(Audit::class);
     }
 
+    public function keywords(): HasMany
+    {
+        return $this->hasMany(Keyword::class);
+    }
+
+    public function contentPieces(): HasMany
+    {
+        return $this->hasMany(ContentPiece::class);
+    }
+
     public function strategies(): HasMany
-{
-    return $this->hasMany(Strategy::class);
-}
+    {
+        return $this->hasMany(Strategy::class);
+    }
 
     public function latestAudit()
     {
@@ -59,6 +69,4 @@ class Project extends Model
 
     public function latestCompletedAudit()
     {
-        return $this->audits()->where('status', Audit::STATUS_COMPLETED)->latest()->first();
-    }
-}
+        return $this->audits()->where('status',

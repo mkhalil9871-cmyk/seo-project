@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\AuditController;
 use App\Http\Controllers\Api\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProjectController;
+use App\Http\Controllers\Api\KeywordController;
+use App\Http\Controllers\Api\ContentPieceController;
 use App\Http\Controllers\Api\StrategyController;
 
 Route::middleware('throttle:6,1')->group(function () {
@@ -23,7 +25,18 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/audits/{audit}/export.csv', [AuditController::class, 'exportCsv']);
     Route::get('/audits/{audit}/export-pages.csv', [AuditController::class, 'exportPagesCsv']);
 
-    Route::get('/projects/{project}/strategies', [StrategyController::class, 'index']);
-    Route::post('/projects/{project}/strategies', [StrategyController::class, 'generate']);
-    Route::get('/projects/{project}/strategies/{strategy}', [StrategyController::class, 'show']);
+    Route::prefix('projects/{project}')->group(function () {
+        Route::get('/keywords', [KeywordController::class, 'index']);
+        Route::post('/keywords', [KeywordController::class, 'store']);
+        Route::delete('/keywords/{keyword}', [KeywordController::class, 'destroy']);
+        Route::post('/keywords/{keyword}/refresh', [KeywordController::class, 'refresh']);
+
+        Route::get('/content', [ContentPieceController::class, 'index']);
+        Route::post('/content', [ContentPieceController::class, 'generate']);
+        Route::get('/content/{contentPiece}', [ContentPieceController::class, 'show']);
+
+        Route::get('/strategies', [StrategyController::class, 'index']);
+        Route::post('/strategies', [StrategyController::class, 'generate']);
+        Route::get('/strategies/{strategy}', [StrategyController::class, 'show']);
+    });
 });
