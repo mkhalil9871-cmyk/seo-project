@@ -100,6 +100,37 @@ class AuditController extends Controller
         ], 201);
     }
 
+    /**
+     * GET /api/projects/{project}/audits/latest — used by the dashboard to show
+     * the most recent audit's status without the frontend needing to track an audit ID.
+     */
+    public function latest(Project $project)
+    {
+        $this->authorizeProjectOwner($project);
+
+        $audit = $project->audits()->latest()->first();
+
+        if (! $audit) {
+            return response()->json(['message' => 'No audits yet for this project.'], 404);
+        }
+
+        return response()->json([
+            'id' => $audit->id,
+            'status' => $audit->status,
+            'pages_crawled' => $audit->pages_crawled,
+            'pages_queued' => $audit->pages_queued,
+            'pages_failed' => $audit->pages_failed,
+            'sitemap_urls_found' => $audit->sitemap_urls_found,
+            'overall_score' => $audit->overall_score,
+            'technical_score' => $audit->technical_score,
+            'content_score' => $audit->content_score,
+            'comparison' => $audit->comparison_json,
+            'started_at' => $audit->started_at,
+            'finished_at' => $audit->finished_at,
+            'error_message' => $audit->error_message,
+        ]);
+    }
+
     public function status(Audit $audit)
     {
         $this->authorizeProjectOwner($audit->project);
@@ -196,6 +227,13 @@ class AuditController extends Controller
     /**
      * GET /api/audits/{audit}/export-pages.csv — one row per crawled page with every
      * captured data point (Screaming Frog's "Internal" tab equivalent).
+     *
+     * Uses a single get() rather than chunk() — chunk()'s offset-based pagination was
+     * triggering an intermittent "unable to open database file" error on SQLite/Windows
+     * during local development (a known SQLite+Windows quirk, not a data problem — verified
+     * the same query works fine via tinker). Audit page counts are small enough (low
+     * thousands at most) that loading them in one go is safe and sidesteps the issue
+     * entirely. Production runs MySQL, where this class of issue doesn't occur regardless.
      */
     public function exportPagesCsv(Audit $audit): StreamedResponse
     {
@@ -216,51 +254,49 @@ class AuditController extends Controller
                 'Is HTTPS', 'Has Mixed Content', 'Has Viewport Meta', 'Language',
             ]);
 
-            $audit->pages()
-                ->orderBy('depth')->orderBy('id')
-                ->chunk(500, function ($pages) use ($out) {
-                    foreach ($pages as $page) {
-                        $headings = $page->headings ?? [];
-                        fputcsv($out, [
-                            $page->url,
-                            $page->status_code,
-                            $page->redirect_to,
-                            $page->is_indexable ? 'Yes' : 'No',
-                            $page->content_type,
-                            $page->x_robots_tag,
-                            $page->depth,
-                            $page->discovered_via,
-                            $page->response_time_ms,
-                            $page->html_size_bytes,
-                            $page->title,
-                            $page->title ? mb_strlen($page->title) : 0,
-                            $page->meta_description,
-                            $page->meta_description ? mb_strlen($page->meta_description) : 0,
-                            $page->meta_robots,
-                            $page->canonical_url,
-                            $page->canonical_status,
-                            implode(' | ', $headings['h1'] ?? []),
-                            count($headings['h1'] ?? []),
-                            count($headings['h2'] ?? []),
-                            count($headings['h3'] ?? []),
-                            count($headings['h4'] ?? []),
-                            count($headings['h5'] ?? []),
-                            count($headings['h6'] ?? []),
-                            $page->word_count,
-                            $page->internal_link_count,
-                            $page->external_link_count,
-                            $page->inbound_internal_links,
-                            $page->image_count,
-                            $page->images_missing_alt,
-                            $page->has_schema ? 'Yes' : 'No',
-                            count($page->hreflangs ?? []),
-                            $page->is_https ? 'Yes' : 'No',
-                            $page->has_mixed_content ? 'Yes' : 'No',
-                            $page->has_viewport ? 'Yes' : 'No',
-                            $page->lang,
-                        ]);
-                    }
-                });
+            $pages = $audit->pages()->orderBy('depth')->orderBy('id')->get();
+
+            foreach ($pages as $page) {
+                $headings = $page->headings ?? [];
+                fputcsv($out, [
+                    $page->url,
+                    $page->status_code,
+                    $page->redirect_to,
+                    $page->is_indexable ? 'Yes' : 'No',
+                    $page->content_type,
+                    $page->x_robots_tag,
+                    $page->depth,
+                    $page->discovered_via,
+                    $page->response_time_ms,
+                    $page->html_size_bytes,
+                    $page->title,
+                    $page->title ? mb_strlen($page->title) : 0,
+                    $page->meta_description,
+                    $page->meta_description ? mb_strlen($page->meta_description) : 0,
+                    $page->meta_robots,
+                    $page->canonical_url,
+                    $page->canonical_status,
+                    implode(' | ', $headings['h1'] ?? []),
+                    count($headings['h1'] ?? []),
+                    count($headings['h2'] ?? []),
+                    count($headings['h3'] ?? []),
+                    count($headings['h4'] ?? []),
+                    count($headings['h5'] ?? []),
+                    count($headings['h6'] ?? []),
+                    $page->word_count,
+                    $page->internal_link_count,
+                    $page->external_link_count,
+                    $page->inbound_internal_links,
+                    $page->image_count,
+                    $page->images_missing_alt,
+                    $page->has_schema ? 'Yes' : 'No',
+                    count($page->hreflangs ?? []),
+                    $page->is_https ? 'Yes' : 'No',
+                    $page->has_mixed_content ? 'Yes' : 'No',
+                    $page->has_viewport ? 'Yes' : 'No',
+                    $page->lang,
+                ]);
+            }
 
             fclose($out);
         }, $filename, ['Content-Type' => 'text/csv']);

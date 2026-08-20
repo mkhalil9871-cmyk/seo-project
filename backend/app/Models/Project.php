@@ -67,6 +67,8 @@ class Project extends Model
         return $this->audits()->latest()->first();
     }
 
-    public function latestCompletedAudit()
+      public function latestCompletedAudit()
     {
-        return $this->audits()->where('status',
+        return $this->audits()->where('status', Audit::STATUS_COMPLETED)->latest()->first();
+    }
+}
