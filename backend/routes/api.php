@@ -20,6 +20,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('projects', ProjectController::class);
 
     Route::post('/projects/{project}/audits', [AuditController::class, 'start']);
+    Route::get('/projects/{project}/audits/latest', [AuditController::class, 'latest']);
     Route::get('/audits/{audit}', [AuditController::class, 'status']);
     Route::get('/audits/{audit}/issues', [AuditController::class, 'issues']);
     Route::get('/audits/{audit}/issues/summary', [AuditController::class, 'issuesSummary']);
