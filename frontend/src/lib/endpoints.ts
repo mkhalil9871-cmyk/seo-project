@@ -46,3 +46,49 @@ export const auditsApi = {
   },
   issuesSummary: (auditId: number) => api.get<IssueSummaryRow[]>(`/audits/${auditId}/issues/summary`),
 }
+
+export interface KeywordInput {
+  keyword: string
+  cluster?: string
+  intent?: 'informational' | 'commercial' | 'transactional' | 'navigational'
+}
+
+export const keywordsApi = {
+  list: (projectId: number) => api.get<{ data: import('./types').Keyword[] }>(`/projects/${projectId}/keywords`),
+  create: (projectId: number, input: KeywordInput) =>
+    api.post<{ data: import('./types').Keyword }>(`/projects/${projectId}/keywords`, input),
+  delete: (projectId: number, keywordId: number) =>
+    api.delete<{ message: string }>(`/projects/${projectId}/keywords/${keywordId}`),
+  refresh: (projectId: number, keywordId: number) =>
+    api.post<{ message: string }>(`/projects/${projectId}/keywords/${keywordId}/refresh`),
+}
+
+export const rankTrackingApi = {
+  list: (projectId: number, keywordId: number) =>
+    api.get<import('./types').RankTracking[]>(`/projects/${projectId}/keywords/${keywordId}/rank-trackings`),
+  check: (projectId: number, keywordId: number, domain?: string) =>
+    api.post<import('./types').RankTracking>(`/projects/${projectId}/keywords/${keywordId}/rank-trackings/check`, {
+      domain,
+    }),
+}
+
+export const strategiesApi = {
+  list: (projectId: number) =>
+    api.get<{ data: import('./types').Strategy[] }>(`/projects/${projectId}/strategies`),
+  generate: (projectId: number) =>
+    api.post<{ data: import('./types').Strategy }>(`/projects/${projectId}/strategies`),
+  get: (projectId: number, strategyId: number) =>
+    api.get<{ data: import('./types').Strategy }>(`/projects/${projectId}/strategies/${strategyId}`),
+}
+
+export const contentApi = {
+  list: (projectId: number) =>
+    api.get<{ data: import('./types').ContentPiece[] }>(`/projects/${projectId}/content`),
+  generate: (projectId: number, keywordId?: number) =>
+    api.post<{ data: import('./types').ContentPiece }>(`/projects/${projectId}/content`, {
+      keyword_id: keywordId,
+    }),
+  get: (projectId: number, contentPieceId: number) =>
+    api.get<{ data: import('./types').ContentPiece }>(`/projects/${projectId}/content/${contentPieceId}`),
+}
+
