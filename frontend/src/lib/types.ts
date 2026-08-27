@@ -76,3 +76,51 @@ export interface PaginatedResponse<T> {
   total: number
   per_page: number
 }
+
+export type SerpStatus = 'pending' | 'success' | 'failed'
+
+export interface SerpResult {
+  position: number | null
+  url: string | null
+  title: string | null
+  checked_at: string | null
+}
+
+export interface Keyword {
+  id: number
+  keyword: string
+  cluster: string | null
+  intent: 'informational' | 'commercial' | 'transactional' | 'navigational' | null
+  serp_status: SerpStatus
+  results?: SerpResult[]
+  created: string
+}
+
+export interface RankTracking {
+  id: number
+  keyword_id: number
+  domain: string
+  position: number | null
+  search_engine: string
+  checked_at: string
+  created_at: string
+}
+
+export interface Strategy {
+  id: number
+  status: 'pending' | 'completed' | 'failed'
+  content: { text?: string; raw?: unknown } | null
+  generated_at: string | null
+  created: string
+}
+
+export interface ContentPiece {
+  id: number
+  title: string | null
+  body: string | null
+  status: 'pending' | 'completed' | 'failed'
+  keyword_id: number | null
+  generated_at: string | null
+  created: string
+}
+
